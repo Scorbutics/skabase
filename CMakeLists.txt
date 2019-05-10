@@ -12,5 +12,6 @@ set(GSL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/gsl)
 set(DOCTEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/doctest)
 set(FAKEIT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/fakeit)
 
+add_subdirectory(external/skalog)
 add_subdirectory(src)
 add_subdirectory(test)

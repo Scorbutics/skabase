@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <cmath>
-#include <SDL_stdinc.h>
 #include "NumberUtils.h"
+
+#define M_PI 3.14159265358979323846
 
 #define SKA_MATH_OPTIMIZATIONS
 

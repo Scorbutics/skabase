@@ -41,7 +41,7 @@ namespace ska {
 	private:
         void existsOrThrow(const std::string& path) const {
 			if (!exists(path)) {
-				throw std::runtime_error("Unable to find the ini path " + path).c_str());
+				throw std::runtime_error("Unable to find the ini path " + path);
 			}
 		}
 
