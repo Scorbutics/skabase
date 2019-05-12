@@ -28,10 +28,9 @@ namespace ska {
 			}
 		}
 
-		std::pair<void*, std::string> getFunction(const char* name) const {
-			//On Windows, pointers to non-member functions and pointers to objects are the same size
-			//So we can cast from FARPROC to void* without problem
-			auto function = reinterpret_cast<void *>(GetProcAddress(m_handle, name));
+		std::pair<ska_default_function_ptr, std::string> getFunction(const char* name) const {
+			//we can cast from FARPROC to ska_default_function_ptr without problem
+			auto function = reinterpret_cast<ska_default_function_ptr>(GetProcAddress(m_handle, name));
 			if (function == NULL) {
 				return std::make_pair(nullptr, GenerateLastErrorMessage());
 			}
@@ -60,7 +59,7 @@ namespace ska {
 				errBuf, sizeof(errBuf), NULL);
 			// Trim trailing spaces
 			char* end = errBuf + strlen(errBuf) - 1;
-			while (end > errBuf && isspace((unsigned char)* end)) end--;
+			while (end > errBuf && isspace(static_cast<unsigned char>(*end))) end--;
 			end[1] = '\0';
 
 			return std::string(errBuf);

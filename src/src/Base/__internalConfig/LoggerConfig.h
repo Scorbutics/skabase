@@ -8,7 +8,7 @@ namespace ska {
 		ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogAsync>,
 		ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogSync>
 	>;
-	SkaLogger BuildLogger(const char* filename);
+	SkaLogger BuildBaseLogger(const char* filename);
 
 	extern SkaLogger GlobalLogger;
 }

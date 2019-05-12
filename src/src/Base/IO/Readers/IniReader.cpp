@@ -4,7 +4,7 @@
 #include <list>
 #include <algorithm>
 #include "IniReader.h"
-#include "Base/Config/LoggerConfig.h"
+#include "Base/__internalConfig/LoggerConfig.h"
 
 void IniListSet(std::list<std::string>& lines, const std::string& path, const std::string& content);
 std::list<std::string>::iterator IniListSearchPath(std::list<std::string>& lines, const std::string& path);

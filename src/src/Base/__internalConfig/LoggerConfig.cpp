@@ -3,9 +3,9 @@
 #include "LoggerConfig.h"
 #include <Signal/SignalHandler.h>
 
-ska::SkaLogger ska::GlobalLogger = ska::BuildLogger("Log.txt");
+ska::SkaLogger ska::GlobalLogger = ska::BuildBaseLogger("Base.log.txt");
 
-ska::SkaLogger ska::BuildLogger(const char * filename) {
+ska::SkaLogger ska::BuildBaseLogger(const char * filename) {
 	static auto TypeBuilderLogFileOutput = std::ofstream { filename };
 	auto logger = SkaLogger{};
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);

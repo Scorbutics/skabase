@@ -3,9 +3,10 @@
 #include <vector>
 #include <algorithm>
 #include "Observer.h"
-#include "../LoggerConfig.h"
 
 namespace ska {
+	struct ObservableLog;
+
 	namespace detail::observable {
 		template<typename C, typename T>
 		inline auto insert_in_container(C& c, T&& t) ->
@@ -38,14 +39,13 @@ namespace ska {
 		}
 
 		void removeObserver(ObserverType& obs) {
-			static Logger<> logger;
 			auto foundObs = std::find_if(std::begin(m_head), std::end(m_head), [&obs](const auto& o) {
 				return &(*o) == &obs;
 			});
 			if (foundObs != std::end(m_head)) {
 				m_head.erase(foundObs);
 			} else {
-				logger.log<LogLevel::Error, decltype(*this)>() << "Trying to delete an observer but not found !";
+				SLOG_STATIC(LogLevel::Error, ObservableLog) << "Trying to delete an observer but not found !";
 			}
 		}
 

@@ -4,6 +4,8 @@
 #include <cassert>
 
 namespace ska {
+	typedef void (*ska_default_function_ptr)(void);
+
 	template <typename Function> struct split_function_args;
 	template <typename Ret, typename ... Args>
 	struct split_function_args<Ret(Args...)> {
@@ -18,7 +20,7 @@ namespace ska {
 		template<class Ret, class ... ArgsF>
 		struct Caller<false, Ret, ArgsF...> {
 			template <class ... Args>
-			static void call(void* functionPtr, Args&&... args) {
+			static void call(ska_default_function_ptr functionPtr, Args&&... args) {
 				const auto typeSafeFunctionPtr = reinterpret_cast<Ret(*)(ArgsF...)>(functionPtr);
 				(*typeSafeFunctionPtr)(std::forward<Args>(args)...);
 			}
@@ -27,7 +29,7 @@ namespace ska {
 		template<class Ret, class ... ArgsF>
 		struct Caller<true, Ret, ArgsF...> {
 			template <class ... Args>
-			static Ret call(void* functionPtr, Args&&... args) {
+			static Ret call(ska_default_function_ptr functionPtr, Args&&... args) {
 				const auto typeSafeFunctionPtr = reinterpret_cast<Ret(*)(ArgsF...)>(functionPtr);
 				return (*typeSafeFunctionPtr)(std::forward<Args>(args)...);
 			}

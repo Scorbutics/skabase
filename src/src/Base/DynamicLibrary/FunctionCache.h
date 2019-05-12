@@ -10,7 +10,7 @@ namespace ska {
 		struct Cache<Value, Key> {
 
 			template <class KeyT>
-			const Value* get() const {
+			constexpr const Value* get() const {
 				if constexpr (!std::is_same<KeyT, Key>::value) {
 					return nullptr;
 				}
@@ -38,7 +38,7 @@ namespace ska {
 		struct Cache<Value, Key, RemainingKeys...> {
 		
 			template <class KeyT>
-			const Value* get() const {
+			constexpr const Value* get() const {
 				if constexpr (std::is_same<KeyT, Key>::value) {
 					return &current;
 				}

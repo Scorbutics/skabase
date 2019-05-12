@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include "CharCache.h"
-#include "Base/Utils/FunctionUtils.h"
-#include "Base/Utils/FileUtils.h"
-#include "Base/Utils/ContainsTypeTuple.h"
-#include "Base/LoggerConfig.h"
+#include "Base/Functions/FunctionUtils.h"
+#include "FunctionCache.h"
+#include "Base/IO/Files/FileUtils.h"
+#include "Base/Meta/ContainsTypeTuple.h"
+#include "Base/SkaConstants.h"
 
 #if defined(SKA_PLATFORM_WIN)
 #include "OSSpecific/DynamicLibraryWindows.h"
@@ -108,7 +108,7 @@ namespace ska {
 			m_cache.set(Func::id, std::move(function));
 		}
 
-		dynlib::Cache<void*, FunctionName...> m_cache;
+		dynlib::Cache<ska_default_function_ptr, FunctionName...> m_cache;
 		std::string m_libraryPath;
 		DynamicLibraryInstance m_instance;
 	};

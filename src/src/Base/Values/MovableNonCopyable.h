@@ -7,7 +7,7 @@ namespace ska {
 		MovableNonCopyable(const MovableNonCopyable&) = delete;
 		MovableNonCopyable& operator=(const MovableNonCopyable&) = delete;
 
-		MovableNonCopyable(MovableNonCopyable&&) = default;
+		MovableNonCopyable(MovableNonCopyable&&) noexcept = default;
 		MovableNonCopyable& operator=(MovableNonCopyable&&) = default;
 
 		virtual ~MovableNonCopyable() = default;

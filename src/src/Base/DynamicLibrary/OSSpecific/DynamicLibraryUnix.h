@@ -31,8 +31,8 @@ namespace ska {
 			}
 		}
 
-		std::pair<void*, std::string> getFunction(const char* name) const {
-			auto function = dlsym(m_handle, name);
+		std::pair<ska_default_function_ptr, std::string> getFunction(const char* name) const {
+			auto function = reinterpret_cast<ska_default_function_ptr>(dlsym(m_handle, name));
 			return std::make_pair(function, (function == nullptr ? std::string((char *)dlerror()) : ""));
 		}
 
