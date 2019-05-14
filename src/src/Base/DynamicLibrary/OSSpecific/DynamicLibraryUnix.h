@@ -1,5 +1,5 @@
 #pragma once
-#include "../SkaConstants.h"
+#include "../../SkaConstants.h"
 #include "../../LoggerConfig.h"
 #if defined(SKA_PLATFORM_LINUX)
 #include <optional>

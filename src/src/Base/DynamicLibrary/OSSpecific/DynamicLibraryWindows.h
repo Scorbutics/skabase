@@ -1,5 +1,5 @@
 #pragma once
-#include "../SkaConstants.h"
+#include "../../SkaConstants.h"
 #if defined(SKA_PLATFORM_WIN)
 
 #include <string>
