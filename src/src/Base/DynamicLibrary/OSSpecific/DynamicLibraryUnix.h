@@ -1,10 +1,8 @@
 #pragma once
 #include "../../SkaConstants.h"
-#include "../../LoggerConfig.h"
 #if defined(SKA_PLATFORM_LINUX)
 #include <optional>
 #include <string>
-#include "../../Exceptions/InputException.h"
 
 //Unix only
 #include <dlfcn.h>
@@ -35,6 +33,9 @@ namespace ska {
 			auto function = reinterpret_cast<ska_default_function_ptr>(dlsym(m_handle, name));
 			return std::make_pair(function, (function == nullptr ? std::string((char *)dlerror()) : ""));
 		}
+
+
+		const std::string& errorMessage() const { return m_errorMessage; }
 
 	private:
 		const char* loadLibrary(const char* lib) {
