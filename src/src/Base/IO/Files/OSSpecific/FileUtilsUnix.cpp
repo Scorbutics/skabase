@@ -1,15 +1,13 @@
 #include "Base/SkaConstants.h"
 #if defined(SKA_PLATFORM_LINUX)
 
+#include <stdexcept>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <vector>
 #include "FileUtilsUnix.h"
-#include "../../Exceptions/FileException.h"
-#include "../../Exceptions/InvalidPathException.h"
-#include "../../Exceptions/ExceptionTrigger.h"
 
 ska::FileUtilsUnix::FileUtilsUnix() {
 }
@@ -17,7 +15,7 @@ ska::FileUtilsUnix::FileUtilsUnix() {
 std::string ska::FileUtilsUnix::getCurrentDirectory() {
    char cwd[2048];
    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-       ExceptionTrigger<FileException>("Unknown error while getting current directory");
+       throw std::runtime_error("Unknown error while getting current directory");
    }
    return std::string(cwd);
 }
@@ -29,7 +27,7 @@ void ska::FileUtilsUnix::createDirectory(const std::string& directoryName) {
 	if (stat(directoryName.c_str(), &st) == -1) {
 		status = mkdir(directoryName.c_str(), 0700);
 		if(status == -1) {
-			ExceptionTrigger<FileException>(("Unknown error during creation of the directory " + directoryName).c_str());
+			throw std::runtime_error("Unknown error during creation of the directory " + directoryName);
 		}
 	}
 }
