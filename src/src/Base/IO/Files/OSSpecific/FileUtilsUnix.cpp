@@ -62,6 +62,10 @@ std::string ska::FileUtilsUnix::getExecutablePath() {
   return path;
 }
 
+bool ska::FileUtilsUnix::isAbsolutePath(const std::string& path) {
+  return !path.empty() && path[0] == '/' ;
+}
+
 ska::FileUtilsUnix::~FileUtilsUnix() {
 }
 

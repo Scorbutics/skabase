@@ -1,7 +1,6 @@
 #pragma once
 #include "Base/SkaConstants.h"
 #if defined(SKA_PLATFORM_WIN)
-#include <string>
 
 namespace ska {
 	class FileUtilsWin {
@@ -13,6 +12,7 @@ namespace ska {
 		static std::string getCurrentDirectory();
 		static std::string getExecutablePath();
 		static void createDirectory(const std::string& directoryName);
+		static bool isAbsolutePath(const std::string& path);
 	};
 }
 #endif

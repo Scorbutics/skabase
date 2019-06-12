@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "Base/SkaConstants.h"
 
 namespace ska {
@@ -23,9 +24,9 @@ namespace ska {
 			auto lastBackSlash = fullFileName.find_last_of('\\');
 			const auto lastFileSeparator = (lastSlash != std::string::npos) ? (lastBackSlash != std::string::npos ? (lastBackSlash > lastSlash ? lastBackSlash : lastSlash) : lastSlash) : lastBackSlash;
 
-			auto fileNameWithExt = lastFileSeparator == std::string::npos ? fullFileName : fullFileName.substr(lastFileSeparator + 1);
+			auto fileNameWithExt = lastFileSeparator == std::string::npos ? "" : fullFileName.substr(lastFileSeparator + 1);
 			const auto extDotPos = fileNameWithExt.find_last_of('.');
-			const auto fpath = fullFileName.substr(0, lastFileSeparator);
+			const auto fpath = lastFileSeparator == std::string::npos ? fullFileName : fullFileName.substr(0, lastFileSeparator);
 			const auto ext = (extDotPos != std::string::npos) ? fileNameWithExt.substr(extDotPos + 1) : "";
 			const auto fname = (extDotPos != std::string::npos) ? fileNameWithExt.substr(0, extDotPos) : fileNameWithExt;
 			return FileNameData(fpath, fname, ext);
@@ -54,6 +55,10 @@ namespace ska {
 
 		static void removeFile(const std::string& filename) {
 			remove(filename.c_str());
+		}
+		
+		static bool isAbsolutePath(const std::string& path) {
+			return T::isAbsolutePath(path);
 		}
 
 	};
