@@ -13,6 +13,7 @@ namespace ska {
 		static std::string getExecutablePath();
 		static void createDirectory(const std::string& directoryName);
 		static bool isAbsolutePath(const std::string& path);
+		static std::string getCanonicalPath(const std::string& path);
 	};
 }
 #endif

@@ -61,6 +61,9 @@ namespace ska {
 			return T::isAbsolutePath(path);
 		}
 
+		static std::string getCanonicalPath(const std::string& path) {
+			return T::getCanonicalPath(path);
+		}
 	};
 
 
