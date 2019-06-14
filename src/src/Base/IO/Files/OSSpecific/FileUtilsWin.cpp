@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include "FileUtilsWin.h"
+#include "Base/Values/Strings/StringUtils.h"
 
 BOOL DirectoryExists(LPCTSTR szPath);
 
@@ -60,11 +61,9 @@ void ska::FileUtilsWin::createDirectory(const std::string& directoryName) {
 			const DWORD& errorCode = GetLastError();
 			if (errorCode == ERROR_PATH_NOT_FOUND) {
 				throw std::runtime_error(("Unable to create directory " + directoryName));
-			}
-			else if (errorCode == ERROR_ALREADY_EXISTS) {
+			} else if (errorCode == ERROR_ALREADY_EXISTS) {
 				throw std::runtime_error(("Directory already exists : " + directoryName));
-			}
-			else {
+			} else {
 				throw std::runtime_error(("Unknown error during creation of the directory " + directoryName));
 			}
 		}
@@ -74,6 +73,44 @@ void ska::FileUtilsWin::createDirectory(const std::string& directoryName) {
 
 bool ska::FileUtilsWin::isAbsolutePath(const std::string& path) {
   return !path.empty() && path.find(":\\") != std::string::npos;
+}
+
+
+static constexpr LPWSTR FULL_PATH_PREFIX = L"\\\\?\\";
+
+static LPWSTR FileUtilsGetCanonicalPath(const std::string& path) {
+	const auto unicodePath = FULL_PATH_PREFIX + ska::StringUtils::toUTF8(path);
+
+	constexpr std::size_t initialSize = 10;
+	auto remainingRequiredSize = initialSize;
+	auto result = static_cast<LPWSTR>(NULL);
+
+	do {
+		const auto tmp = static_cast<LPWSTR>(realloc(result, remainingRequiredSize * sizeof(WCHAR)));
+		if (tmp == NULL) {
+			return NULL;
+		}
+		result = tmp;
+		remainingRequiredSize = GetFullPathNameW(unicodePath.c_str(), remainingRequiredSize, result, NULL);
+	} while (result[0] == '\0');
+
+	return result;
+}
+
+std::string ska::FileUtilsWin::getCanonicalPath(const std::string& path) {
+	auto mallocedPath = FileUtilsGetCanonicalPath(path);
+	if (mallocedPath == NULL) {
+		return path;
+	}
+
+	try {
+		auto canonicalPath = std::wstring{ mallocedPath + lstrlenW(FULL_PATH_PREFIX) };
+		free(mallocedPath);
+		return StringUtils::toANSI(canonicalPath);
+	} catch (std::exception& e) {
+		free(mallocedPath);
+	}
+	return path;
 }
 
 ska::FileUtilsWin::~FileUtilsWin() {
