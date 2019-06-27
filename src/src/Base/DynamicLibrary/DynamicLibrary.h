@@ -6,6 +6,12 @@
 #include "Base/Meta/ContainsTypeTuple.h"
 #include "Base/SkaConstants.h"
 
+namespace ska {
+	class DynamicLibraryTag;
+}
+
+SKA_LOGC_CONFIG(LogLevel::Disabled, DynamicLibraryTag)
+
 #if defined(SKA_PLATFORM_WIN)
 #include "OSSpecific/DynamicLibraryWindows.h"
 namespace ska {
@@ -66,7 +72,7 @@ namespace ska {
 				int _[] = { 0, (buildCache<FunctionName>() , 0)... };
 				(void)_;
 			} else {
-                SLOG(LogLevel::Warn) << "Library " <<  m_libraryPath << " cannot be loaded : " << m_instance.errorMessage() << " (current directory is \"" << FileUtils::getCurrentDirectory() << "\")";
+				SLOG_STATIC(LogLevel::Warn, DynamicLibraryTag) << "Library " <<  m_libraryPath << " cannot be loaded : " << m_instance.errorMessage() << " (current directory is \"" << FileUtils::getCurrentDirectory() << "\")";
 			}
 		}
 
@@ -102,7 +108,7 @@ namespace ska {
 			const auto& funcName = Func::name;
 			auto [function, error] = m_instance.getFunction(funcName.c_str());
 			if (function == nullptr) {
-                SLOG(LogLevel::Warn) << "Unable to find the function " << funcName << " in the module " << m_libraryPath << " : " << error;
+				SLOG_STATIC(LogLevel::Warn, DynamicLibraryTag) << "Unable to find the function " << funcName << " in the module " << m_libraryPath << " : " << error;
 			}
 			assert(function != nullptr);
 			m_cache.set(Func::id, std::move(function));
@@ -113,3 +119,4 @@ namespace ska {
 		DynamicLibraryInstance m_instance;
 	};
 }
+
