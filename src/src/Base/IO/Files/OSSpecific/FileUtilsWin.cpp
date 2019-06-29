@@ -72,7 +72,7 @@ void ska::FileUtilsWin::createDirectory(const std::string& directoryName) {
 }
 
 bool ska::FileUtilsWin::isAbsolutePath(const std::string& path) {
-  return !path.empty() && path.find(":\\") != std::string::npos;
+  return !path.empty() && (path.find(":\\") != std::string::npos || path.find(":/") != std::string::npos);
 }
 
 
