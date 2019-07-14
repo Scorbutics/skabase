@@ -1,6 +1,6 @@
 #include "Base/SkaConstants.h"
 #if defined(SKA_PLATFORM_LINUX)
-
+#include <string>
 #include <cstdlib>
 #include <stdexcept>
 #include <errno.h>
