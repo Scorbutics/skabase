@@ -70,7 +70,7 @@ bool ska::FileUtilsUnix::isAbsolutePath(const std::string& path) {
 std::string ska::FileUtilsUnix::getCanonicalPath(const std::string& path) {
   char* mallocedPath = realpath(path.c_str(), NULL);
   try {
-    auto result = std::string {mallocedPath};
+    auto result = mallocedPath == NULL ? path : std::string {mallocedPath};
     free(mallocedPath);
     return result;
   } catch(std::exception& e) {
