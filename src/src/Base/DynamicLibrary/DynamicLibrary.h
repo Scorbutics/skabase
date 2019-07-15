@@ -28,7 +28,9 @@ namespace ska {
 template <>\
 struct HasFunctionFormatTrait<STRUCT_NAME<ENUM>> {\
 using FunctionFormat = FUNCTION;\
-}
+};\
+template <>\
+std::string STRUCT_NAME<ENUM>::name;
 
 #define SKA_LIB_NAME_DEFINE(STRUCT_NAME, ENUM, NAME)\
 template <>\
