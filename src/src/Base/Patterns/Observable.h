@@ -38,15 +38,15 @@ namespace ska {
 			detail::observable::insert_in_container(m_head, &obs);        
 		}
 
-		void removeObserver(ObserverType& obs) {
+		bool removeObserver(ObserverType& obs) {
 			auto foundObs = std::find_if(std::begin(m_head), std::end(m_head), [&obs](const auto& o) {
 				return &(*o) == &obs;
 			});
 			if (foundObs != std::end(m_head)) {
 				m_head.erase(foundObs);
-			} else {
-				SLOG_STATIC(LogLevel::Error, ObservableLog) << "Trying to delete an observer but not found !";
+				return true;
 			}
+			return false;
 		}
 
 		bool notifyObservers(T& t) {
