@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
 
-int main(int argv, char* argv[]) {
+int main(int argc, char* argv[]) {
     doctest::Context context = doctest::Context{argc, argv};
     auto resultCode = 0;
 
