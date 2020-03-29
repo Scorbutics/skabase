@@ -13,21 +13,33 @@ namespace ska {
 				m_data(data),
 				m_name(std::move(name)),
 				m_pusher(pusher),
-				m_bytesAllocated(0),
 				m_bytesAllocatedMax(bytesRequired) {
 			}
 
 			SerializerSafeZone(SerializerSafeZone&&) noexcept = default;
 			SerializerSafeZone& operator=(SerializerSafeZone&&) = default;
 
-			virtual ~SerializerSafeZone() = default;
+			virtual ~SerializerSafeZone() {
+				validate(true);
+			}
+
+			void validate(bool exact = false) {
+				if (m_valid) {
+					return;
+				}
+
+				if (exact && m_bytesWritten != m_bytesAllocatedMax || m_bytesWritten > m_bytesAllocatedMax) {
+					m_valid = true;
+					m_pusher.onError({ 0, m_bytesAllocatedMax, m_bytesWritten, m_name, "bad serializer sync detected" });
+				}
+			}
 
 			template <class T>
 			void write(const T& data) {
 				if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, std::string>) {
 					incBytes(sizeof(int64_t));
-					m_data.natives().emplace(data, m_data.natives().size());
-					auto refIndex = m_data.natives().at(data);
+					m_data.natives().emplace(data, data);
+					auto refIndex = m_data.natives().id(data);
 					m_data.buffer().write(reinterpret_cast<const char*>(&refIndex), sizeof(int64_t));
 				} else {
 					incBytes(sizeof(T));
@@ -35,11 +47,42 @@ namespace ska {
 				}
 			}
 
+			template <class T>
+			T read() {
+				if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, std::string>) {
+					incBytes(sizeof(int64_t));
+					auto size = int64_t { 0 };
+					m_data.buffer().read(reinterpret_cast<char*>(&size), sizeof(int64_t));
+					if (size >= 0 && static_cast<std::size_t>(size) < m_data.natives().size()) {
+						return m_data.natives()[size];
+					}
+					return "";
+				} else {
+					incBytes(sizeof(T));
+					T value;
+					m_data.buffer().read(reinterpret_cast<char*>(&value), sizeof(T));
+					return value;
+				}
+			}
+
+			void reset() {
+				m_bytesAllocated = 0;
+				decBytes(m_bytesWritten);
+			}
+
 		private:
+			bool m_valid = false;
 			SerializerSafeZone* m_parent;
 			std::size_t m_bytesWritten = 0;
 			std::size_t m_bytesAllocated = 0;
 			std::size_t m_bytesAllocatedMax = 0;
+
+			void decBytes(std::size_t bytes) {
+				if (m_parent != nullptr) {
+					m_parent->decBytes(bytes);
+				}
+				m_bytesWritten -= bytes;
+			}
 
 			void incBytes(std::size_t bytes) {
 				if (m_parent != nullptr) {
@@ -51,10 +94,10 @@ namespace ska {
 				if (requiredAllocation > 0) {
 					allocate(requiredAllocation);
 				}
+				validate();
 			}
 
 		protected:
-			std::size_t bytesWritten() const { return m_bytesWritten; }
 			template <class T>
 			long allocate(T bytes) { m_bytesAllocated += static_cast<long>(bytes); return static_cast<long>(m_bytesAllocatedMax - m_bytesAllocated); }
 
@@ -75,12 +118,6 @@ namespace ska {
 
 		SerializerSafeZone(SerializerSafeZone&&) noexcept = default;
 		SerializerSafeZone& operator=(SerializerSafeZone&&) = default;
-
-		virtual ~SerializerSafeZone() {
-			if (bytesWritten() != BytesWrittenRequired) {
-				m_pusher.onError({0, BytesWrittenRequired, bytesWritten(), m_name, "bad serializer sync detected"});
-			}
-		}
 
 		template <std::size_t Bytes>
 		SerializerSafeZone<Bytes> acquireMemory(std::string zoneName) {

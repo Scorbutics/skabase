@@ -1,8 +1,7 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
+#include "Base/Containers/order_indexed_string_map.h"
 
 namespace ska {
-	using SerializerNativeContainer = std::unordered_map<std::string, std::size_t>;	
+	using SerializerNativeContainer = order_indexed_string_map<std::string>;
 }
