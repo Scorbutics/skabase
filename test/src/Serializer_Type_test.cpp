@@ -30,11 +30,9 @@ namespace ska {
 		static constexpr std::size_t BytesRequired = sizeof(int) + SerializerTypeTraits<std::string>::BytesRequired;
 		static constexpr const char* Name = "Toto";
 
-		static Toto Read(SerializerSafeZone<BytesRequired>& zone) {
-			Toto toto;
+		static void Read(SerializerSafeZone<BytesRequired>& zone, Toto& toto) {
 			toto.a = zone.read<int>();
 			toto.lol = zone.read<std::string>();
-			return toto;
 		}
 
 		static void Write(SerializerSafeZone<BytesRequired>& zone, const Toto& toto) {
@@ -48,11 +46,9 @@ namespace ska {
 		static constexpr std::size_t BytesRequired = SerializerTypeTraits<Toto>::BytesRequired + sizeof(uint64_t);
 		static constexpr const char* Name = "Titi";
 
-		static Titi Read(SerializerSafeZone<BytesRequired>& zone) {
-			Titi titi;
-			titi.toto = SerializerTypeTraits<Toto>::Read(zone.acquireMemory<SerializerTypeTraits<Toto>::BytesRequired>("Toto"));
+		static void Read(SerializerSafeZone<BytesRequired>& zone, Titi& titi) {
+			SerializerTypeTraits<Toto>::Read(zone.acquireMemory<SerializerTypeTraits<Toto>::BytesRequired>("Toto"), titi.toto);
 			titi.id = zone.read<uint64_t>();
-			return titi;
 		}
 
 		static void Write(SerializerSafeZone<BytesRequired>& zone, const Titi& titi) {
@@ -79,8 +75,9 @@ TEST_CASE("[SerializerType] test") {
 		Toto t{ 0, "mdr" };
 
 		totoSerializer.write(t);
-
-		Toto t2 = totoSerializer.read();
+		totoSerializer.reset();
+		Toto t2;
+		totoSerializer.read(t2);
 
 		CHECK(t2.a == t.a);
 		CHECK(t2.lol == t.lol);
@@ -92,8 +89,9 @@ TEST_CASE("[SerializerType] test") {
 		Titi t{ 123, {4, "ll"}, nullptr };
 
 		titiSerializer.write(t);
-
-		Titi t2 = titiSerializer.read();
+		titiSerializer.reset();
+		Titi t2;
+		titiSerializer.read(t2);
 
 		CHECK(t2.id == t.id);
 		CHECK(t2.toto.a == t.toto.a);

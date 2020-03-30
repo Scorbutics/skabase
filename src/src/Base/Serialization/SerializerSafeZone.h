@@ -47,6 +47,12 @@ namespace ska {
 				}
 			}
 
+			template <std::size_t length>
+			void writeNull() {
+				char buf[length] = "";
+				this->template write<decltype(buf)>(buf);
+			}
+
 			template <class T>
 			T read() {
 				if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, std::string>) {
