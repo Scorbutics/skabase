@@ -5,10 +5,7 @@
 namespace ska {
 	
 	template <class Type>
-	struct SerializerTypeTraits {
-		static constexpr std::size_t BytesRequired = sizeof(Type);
-		static constexpr const char* Name = "";
-	};
+	struct SerializerTypeTraits {};
 
 	template <class Type, class ... Args>
 	struct SerializerType {
@@ -26,8 +23,14 @@ namespace ska {
 			m_zone(zone.acquireMemory<BytesRequired>(TypeName)) {
 		}
 
-		void write(const Type& type, Args&& ... args) { SerializerTypeTraits<Type>::Write(m_zone, type, std::forward<Args>(args)...); }
-		void read(Type& type, Args&& ... args) { SerializerTypeTraits<Type>::Read(m_zone, type, std::forward<Args>(args)...); }
+		void write(const std::remove_pointer_t<Type>& type, Args&& ... args) { 
+			SerializerTypeTraits<Type>::Write(m_zone, type, std::forward<Args>(args)...);
+		}
+
+		void read(Type& type, Args&& ... args) {
+			SerializerTypeTraits<Type>::Read(m_zone, type, std::forward<Args>(args)...);
+		}
+
 		void reset() { m_zone.reset(); }
 
 	protected:

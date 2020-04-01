@@ -13,6 +13,7 @@ namespace ska {
 		
 		std::stringstream& buffer() { return *m_buffer; }
 		SerializerNativeContainer& natives() { return *m_natives; }
+		const SerializerNativeContainer& natives() const { return *m_natives; }
 
 	private:
 		std::stringstream* m_buffer;

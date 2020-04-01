@@ -1,5 +1,4 @@
 #pragma once
-
 #include "SerializerOutputData.h"
 #include "SerializerValidator.h"
 
@@ -16,8 +15,21 @@ namespace ska {
 				m_bytesAllocatedMax(bytesRequired) {
 			}
 
-			SerializerSafeZone(SerializerSafeZone&&) noexcept = default;
-			SerializerSafeZone& operator=(SerializerSafeZone&&) = default;
+			SerializerSafeZone(SerializerSafeZone&& sfz) noexcept :
+				m_data(std::move(sfz.m_data)),
+				m_pusher(sfz.m_pusher) {
+				m_parent = sfz.m_parent;
+				m_name = std::move(sfz.m_name);
+				m_bytesAllocatedMax = sfz.m_bytesAllocatedMax;
+				m_valid = sfz.m_valid;
+				m_bytesWritten = sfz.m_bytesWritten;
+				m_bytesAllocated = sfz.m_bytesAllocated;
+				sfz.m_valid = true;
+			};
+
+			SerializerSafeZone& operator=(SerializerSafeZone&&) = delete;
+			SerializerSafeZone(const SerializerSafeZone&) noexcept = delete;
+			SerializerSafeZone& operator=(const SerializerSafeZone&) = delete;
 
 			virtual ~SerializerSafeZone() {
 				validate(true);
@@ -47,10 +59,19 @@ namespace ska {
 				}
 			}
 
+			std::size_t ref(const std::string& nativeStr) {
+				m_data.natives().emplace(nativeStr, nativeStr);
+				return m_data.natives().id(nativeStr);
+			}
+
+			const std::string& ref(std::size_t id) const {
+				return m_data.natives().at(id);
+			}
+
 			template <std::size_t length>
 			void writeNull() {
 				char buf[length] = "";
-				this->template write<decltype(buf)>(buf);
+				write(buf);
 			}
 
 			template <class T>
@@ -69,6 +90,13 @@ namespace ska {
 					m_data.buffer().read(reinterpret_cast<char*>(&value), sizeof(T));
 					return value;
 				}
+			}
+
+			template <std::size_t length>
+			void readNull() {
+				char value[length];
+				incBytes(length);
+				m_data.buffer().read(value,length);
 			}
 
 			void reset() {
