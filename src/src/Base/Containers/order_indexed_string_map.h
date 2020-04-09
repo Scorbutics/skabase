@@ -79,6 +79,15 @@ namespace ska {
 			return *result;
 		}
 
+		const TRaw& at(const std::string& name) const {
+			const auto index = namedMapCache.at(name);
+			auto* result = atOrNull(index);
+			if (result == nullptr) {
+				throw std::runtime_error("bad element name \"" + name + "\" with index \"" + std::to_string(index) + "\"");
+			}
+			return *result;
+		}
+
 		TRaw& at(std::size_t index) {
 			if (!exist(index)) {
 				throw std::runtime_error("bad element index \"" + std::to_string(index) + "\"");
@@ -135,6 +144,10 @@ namespace ska {
 			return namedMapCache.at(name);
 		}
 
+		std::size_t id(const std::string& name) const {
+			return namedMapCache.at(name);
+		}
+
 		void resizeIfTooSmall(std::size_t length) {
 			if (cache.size() < length) {
 				cache.resize(length);
@@ -161,6 +174,13 @@ namespace ska {
 		}
 
 		TRaw* atOrNull(std::size_t index) {
+			if (!exist(index)) {
+				return nullptr;
+			}
+			return cache[index].get();
+		}
+
+		const TRaw* atOrNull(std::size_t index) const {
 			if (!exist(index)) {
 				return nullptr;
 			}
