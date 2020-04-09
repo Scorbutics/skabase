@@ -1,6 +1,12 @@
 #include <iostream>
 #include "SerializerValidator.h"
 
+bool ska::SerializerValidator::ShouldAbort = true;
+
+void ska::SerializerValidator::DisableAbort() {
+    ShouldAbort = false;
+}
+
 void ska::SerializerValidator::onError(SerializerErrorData data) {
     m_errors.push_back(std::move(data));
 }
@@ -24,12 +30,19 @@ void ska::SerializerValidator::validateOrAbort() noexcept {
             std::cerr << errorData.bytesRequested << " are now requested." << std::endl;
             std::cerr << sme.what() << std::endl;
         }
-        abort();
+        
+        if (SerializerValidator::ShouldAbort) {
+            abort();
+        }
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-        abort();
+        if (SerializerValidator::ShouldAbort) {
+            abort();
+        }
     } catch (...) {
         std::cerr << "Unknown error occured while serialization process" << std::endl;
-        abort();
+        if (SerializerValidator::ShouldAbort) {
+            abort();
+        }
     }
 }

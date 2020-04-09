@@ -7,6 +7,7 @@
 #include "SerializationMemoryException.h"
 
 namespace ska {
+
 	class SerializerValidator {
 	public:
 		SerializerValidator() = default;
@@ -16,7 +17,11 @@ namespace ska {
 		void validateOrThrow();
 		void validateOrAbort() noexcept;
 
+		static void DisableAbort();
+
 	private:
+		static bool ShouldAbort;
+
 		template <class Function>
 		bool validate(Function&& callback) {
 			auto errors = m_errors;
