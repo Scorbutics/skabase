@@ -92,6 +92,11 @@ namespace ska {
 				}
 			}
 
+			void readBytes(std::size_t bytesSize, char* bytes) {
+				incBytes(bytesSize);
+				m_data.buffer().read(bytes, bytesSize);
+			}
+
 			template <std::size_t length>
 			void readNull() {
 				char value[length];

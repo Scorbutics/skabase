@@ -19,6 +19,11 @@ namespace ska {
 			return SerializerSafeZone<bytes>{nullptr, *this, std::move(zoneName), m_data};
 		}
 
+		detail::SerializerSafeZone acquireMemory(std::size_t bytes, std::string zoneName) {
+			validateOrThrow();
+			return {nullptr, * this, std::move(zoneName), m_data, bytes};
+		}
+
 		~SerializerOutput() {
 			validateOrAbort();
 		}
