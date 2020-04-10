@@ -168,7 +168,7 @@ namespace ska {
 		
 		template <class Key, class Value>
 		bool operator==(const insertion_indexed_map<Key, Value>& right) const {
-			return m_values == right.m_values && m_keys == right.m_keys;
+			return m_values == right.m_values;
 		}
 
 		template <class Key, class Value>
