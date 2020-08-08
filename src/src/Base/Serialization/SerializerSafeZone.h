@@ -40,7 +40,7 @@ namespace ska {
 					return;
 				}
 
-				if (exact && m_bytesWritten != m_bytesAllocatedMax || m_bytesWritten > m_bytesAllocatedMax) {
+				if ((exact && m_bytesWritten != m_bytesAllocatedMax) || m_bytesWritten > m_bytesAllocatedMax) {
 					m_valid = true;
 					m_pusher.onError({ 0, m_bytesAllocatedMax, m_bytesWritten, m_name, "bad serializer sync detected" });
 				}

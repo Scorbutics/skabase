@@ -18,7 +18,7 @@ namespace ska {
 		SerializationMemoryException(std::vector<SerializerErrorData> data) : data(std::move(data)) {}
 		std::vector<SerializerErrorData> data;
 
-		char const* what() const override;
+		char const* what() const noexcept override;
 
 		template <class ... Args>
 		void queue(char buffer[], std::size_t counter, Args&& ... args) const {

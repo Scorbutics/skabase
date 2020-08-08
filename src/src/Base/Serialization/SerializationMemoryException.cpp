@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include "SerializationMemoryException.h"
 
-char const* ska::SerializationMemoryException::what() const {
+char const* ska::SerializationMemoryException::what() const noexcept {
     static char buffer[MAX_BUF];
     memset(buffer, 0, MAX_BUF);
     std::size_t counter = 0;
