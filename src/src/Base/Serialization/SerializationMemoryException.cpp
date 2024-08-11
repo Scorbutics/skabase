@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include "SerializationMemoryException.h"
 
 char const* ska::SerializationMemoryException::what() const noexcept {
