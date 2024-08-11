@@ -27,7 +27,7 @@ namespace ska {
 
 		auto find(const Key& key) {
 			auto itName = m_keys.find(key);
-			if (itName == m_keys.end()) { return m_values.end(); } 
+			if (itName == m_keys.end()) { return m_values.end(); }
 			auto it = m_values.begin();
 			std::advance(it, itName->second);
 			return it;
@@ -59,21 +59,17 @@ namespace ska {
 				return false;
 			}
 
-			if constexpr (IsPtrValue) {
-				return m_values[index] != nullptr;
-			} else {
-				return m_values[index].has_value();
-			}
+			return valueExists(m_values[index]);
 		}
 
 		auto* atOrNull(const Key& key) {
 			const auto it = m_keys.find(key);
-			return it != m_keys.end() ? &at(it->second) : nullptr;
+			return it != m_keys.end() ? atOrNull(it->second) : nullptr;
 		}
 
 		const auto* atOrNull(const Key& key) const {
 			const auto it = m_keys.find(key);
-			return it != m_keys.end() ? &at(it->second) : nullptr;
+			return it != m_keys.end() ? atOrNull(it->second) : nullptr;
 		}
 
 		ValueUnderlyingType& at(const Key& key) {
@@ -121,6 +117,8 @@ namespace ska {
 				return false;
 			} else if (force || !exist(emplacedItem.first->second)) {
 				pushCache(emplacedItem.first->second, std::forward<ValueLocal>(element));
+			} else {
+				m_keys.erase(key);
 			}
 			return true;
 		}
@@ -128,7 +126,10 @@ namespace ska {
 		void set(std::size_t index, Value element) {
 			if (index >= m_values.size()) {
 				throw std::runtime_error("unable to add a new element by using the index setter : use \"emplace\" first.");
-			}	
+			}
+			if (!valueExists(element)) {
+				throw std::runtime_error("unable to set an empty element by using the index setter.");
+			}
 			m_values[index] = std::move(element);
 		}
 
@@ -165,10 +166,10 @@ namespace ska {
 			}
 			return nullptr;
 		}
-		
+
 		template <class Key_, class Value_>
 		bool operator==(const insertion_indexed_map<Key_, Value_>& right) const {
-			return m_values == right.m_values;
+			return m_values == right.m_values && m_keys == right.m_keys;
 		}
 
 		template <class Key_, class Value_>
@@ -177,6 +178,14 @@ namespace ska {
 		}
 
 	private:
+		static bool valueExists(const Value& value) {
+			if constexpr (IsPtrValue) {
+				return value != nullptr;
+			} else {
+				return value.has_value();
+			}
+		}
+
 		std::size_t findNextAvailableElementId() const {
 			return m_keys.size();
 		}
@@ -186,9 +195,13 @@ namespace ska {
 				return nullptr;
 			}
 			if constexpr (IsPtrValue) {
-				return m_values[index].get();
+				if constexpr(is_smart_ptr<ValueRaw>::value) {
+					return m_values[index].get();
+				} else {
+					return m_values[index];
+				}
 			} else {
-				return &m_values[index];
+				return &m_values[index].value();
 			}
 		}
 
@@ -197,9 +210,13 @@ namespace ska {
 				return nullptr;
 			}
 			if constexpr (IsPtrValue) {
-				return m_values[index].get();
+				if constexpr(is_smart_ptr<ValueRaw>::value) {
+					return m_values[index].get();
+				} else {
+					return m_values[index];
+				}
 			} else {
-				return &m_values[index];
+				return &m_values[index].value();
 			}
 		}
 
@@ -209,7 +226,7 @@ namespace ska {
 			if constexpr (is_smart_ptr<ValueLocal>::value || std::is_pointer_v<ValueLocal> || !IsPtrValue) {
 				m_values[index] = std::forward<ValueLocal>(element);
 			} else {
-				m_values[index] = ValueRaw{ new ValueUnderlyingType(std::forward<ValueLocal>(element)) };				
+				m_values[index] = ValueRaw{ new ValueUnderlyingType(std::forward<ValueLocal>(element)) };
 			}
 		}
 
